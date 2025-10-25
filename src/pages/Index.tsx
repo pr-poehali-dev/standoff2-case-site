@@ -8,6 +8,17 @@ import RulesSection from '@/components/sections/RulesSection';
 import FaqSection from '@/components/sections/FaqSection';
 import ProfileSection from '@/components/sections/ProfileSection';
 import LeaderboardSection from '@/components/sections/LeaderboardSection';
+import AchievementsSection from '@/components/sections/AchievementsSection';
+import DailyBonusSection from '@/components/sections/DailyBonusSection';
+import HistorySection from '@/components/sections/HistorySection';
+import ContractSection from '@/components/sections/ContractSection';
+import PromoSection from '@/components/sections/PromoSection';
+import ReferralSection from '@/components/sections/ReferralSection';
+import VIPSection from '@/components/sections/VIPSection';
+import InventorySection from '@/components/sections/InventorySection';
+import StatsSection from '@/components/sections/StatsSection';
+import ThemeToggle from '@/components/ThemeToggle';
+import ParticlesBackground from '@/components/ParticlesBackground';
 
 interface LiveDrop {
   id: number;
@@ -140,6 +151,24 @@ const Index = () => {
         return <ProfileSection />;
       case 'leaderboard':
         return <LeaderboardSection leaderboard={leaderboard} />;
+      case 'achievements':
+        return <AchievementsSection />;
+      case 'daily':
+        return <DailyBonusSection />;
+      case 'history':
+        return <HistorySection />;
+      case 'contract':
+        return <ContractSection />;
+      case 'promo':
+        return <PromoSection />;
+      case 'referral':
+        return <ReferralSection />;
+      case 'vip':
+        return <VIPSection />;
+      case 'inventory':
+        return <InventorySection />;
+      case 'stats':
+        return <StatsSection />;
       default:
         return null;
     }
@@ -147,6 +176,8 @@ const Index = () => {
 
   return (
     <>
+      <ParticlesBackground />
+      
       {openingCase && (
         <CaseOpening 
           caseData={openingCase} 
@@ -154,7 +185,7 @@ const Index = () => {
         />
       )}
       
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background relative z-10">
       <nav className="sticky top-0 z-50 bg-background/80 backdrop-blur-lg border-b border-border">
         <div className="container mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
@@ -163,25 +194,41 @@ const Index = () => {
               <span className="font-heading text-2xl font-bold">SO2 CASES</span>
             </div>
             
-            <div className="hidden md:flex items-center gap-2">
+            <div className="hidden lg:flex items-center gap-1">
               {[
                 { id: 'home', label: 'Главная', icon: 'Home' },
                 { id: 'cases', label: 'Кейсы', icon: 'Package' },
-                { id: 'rules', label: 'Правила', icon: 'Shield' },
-                { id: 'faq', label: 'FAQ', icon: 'HelpCircle' },
-                { id: 'profile', label: 'Профиль', icon: 'User' },
-                { id: 'leaderboard', label: 'Рейтинг', icon: 'Trophy' }
+                { id: 'inventory', label: 'Инвентарь', icon: 'Backpack' },
+                { id: 'contract', label: 'Контракт', icon: 'Repeat' },
+                { id: 'achievements', label: 'Достижения', icon: 'Award' },
+                { id: 'stats', label: 'Статистика', icon: 'BarChart3' },
+                { id: 'leaderboard', label: 'Рейтинг', icon: 'Trophy' },
+                { id: 'vip', label: 'VIP', icon: 'Crown' }
               ].map((item) => (
                 <Button
                   key={item.id}
                   variant={activeSection === item.id ? 'default' : 'ghost'}
                   onClick={() => setActiveSection(item.id)}
+                  size="sm"
                   className={activeSection === item.id ? 'bg-primary hover:bg-primary/90' : ''}
                 >
-                  <Icon name={item.icon as any} className="mr-2" size={18} />
+                  <Icon name={item.icon as any} className="mr-1" size={16} />
                   {item.label}
                 </Button>
               ))}
+            </div>
+
+            <div className="hidden md:flex items-center gap-2">
+              <ThemeToggle />
+              <Button
+                variant="outline"
+                onClick={() => setActiveSection('daily')}
+                className="relative"
+              >
+                <Icon name="Gift" className="mr-2" size={18} />
+                Бонус
+                <div className="absolute -top-1 -right-1 w-3 h-3 bg-primary rounded-full animate-pulse" />
+              </Button>
             </div>
 
             <div className="md:hidden">
@@ -198,15 +245,24 @@ const Index = () => {
       </nav>
 
       {mobileMenuOpen && (
-        <div className="md:hidden fixed inset-0 top-[73px] z-40 bg-background/95 backdrop-blur-lg animate-fade-in">
+        <div className="md:hidden fixed inset-0 top-[73px] z-40 bg-background/95 backdrop-blur-lg animate-fade-in overflow-y-auto">
           <div className="container mx-auto px-6 py-8 space-y-2">
             {[
               { id: 'home', label: 'Главная', icon: 'Home' },
               { id: 'cases', label: 'Кейсы', icon: 'Package' },
-              { id: 'rules', label: 'Правила', icon: 'Shield' },
-              { id: 'faq', label: 'FAQ', icon: 'HelpCircle' },
+              { id: 'inventory', label: 'Инвентарь', icon: 'Backpack' },
+              { id: 'contract', label: 'Контракт', icon: 'Repeat' },
+              { id: 'daily', label: 'Ежедневный бонус', icon: 'Gift' },
+              { id: 'achievements', label: 'Достижения', icon: 'Award' },
+              { id: 'history', label: 'История', icon: 'Clock' },
+              { id: 'stats', label: 'Статистика', icon: 'BarChart3' },
+              { id: 'leaderboard', label: 'Рейтинг', icon: 'Trophy' },
+              { id: 'vip', label: 'VIP статус', icon: 'Crown' },
+              { id: 'promo', label: 'Промокоды', icon: 'Ticket' },
+              { id: 'referral', label: 'Рефералы', icon: 'Users' },
               { id: 'profile', label: 'Профиль', icon: 'User' },
-              { id: 'leaderboard', label: 'Рейтинг', icon: 'Trophy' }
+              { id: 'rules', label: 'Правила', icon: 'Shield' },
+              { id: 'faq', label: 'FAQ', icon: 'HelpCircle' }
             ].map((item) => (
               <Button
                 key={item.id}
