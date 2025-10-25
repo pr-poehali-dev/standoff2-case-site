@@ -6,10 +6,66 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/
 import Icon from '@/components/ui/icon';
 import CaseOpening from '@/components/CaseOpening';
 
+interface LiveDrop {
+  id: number;
+  username: string;
+  item: string;
+  rarity: string;
+  color: string;
+  timestamp: string;
+}
+
 const Index = () => {
   const [activeSection, setActiveSection] = useState('home');
   const [openingCase, setOpeningCase] = useState<any>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [liveDrops, setLiveDrops] = useState<LiveDrop[]>([]);
+  const [totalOpened, setTotalOpened] = useState(12847);
+  const [onlineUsers, setOnlineUsers] = useState(234);
+
+  useEffect(() => {
+    const weapons = [
+      { name: 'AK-47 | Огненный змей', rarity: 'Легендарный', color: '#F97316' },
+      { name: 'AWP | Азимов', rarity: 'Эпический', color: '#0EA5E9' },
+      { name: 'Desert Eagle | Золотая лихорадка', rarity: 'Редкий', color: '#EAB308' },
+      { name: 'M4A4 | Городской камуфляж', rarity: 'Обычный', color: '#6B7280' },
+      { name: 'USP-S | Киберпанк', rarity: 'Эпический', color: '#0EA5E9' },
+      { name: 'Glock-18 | Ночной страж', rarity: 'Обычный', color: '#6B7280' },
+      { name: 'Dragonuv | Красный дракон', rarity: 'Легендарный', color: '#F97316' },
+      { name: 'P90 | Неон', rarity: 'Редкий', color: '#EAB308' },
+    ];
+
+    const usernames = ['ProGamer', 'SniperKing', 'NinjaWarrior', 'TacticalMind', 'ElitePlayer', 'Striker', 'Shadow', 'Phoenix', 'Viper', 'Ghost'];
+
+    const generateDrop = () => {
+      const weapon = weapons[Math.floor(Math.random() * weapons.length)];
+      const username = usernames[Math.floor(Math.random() * usernames.length)];
+      const now = new Date();
+      
+      return {
+        id: Date.now(),
+        username,
+        item: weapon.name,
+        rarity: weapon.rarity,
+        color: weapon.color,
+        timestamp: now.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit', second: '2-digit' })
+      };
+    };
+
+    const interval = setInterval(() => {
+      setLiveDrops(prev => {
+        const newDrop = generateDrop();
+        const updated = [newDrop, ...prev].slice(0, 5);
+        return updated;
+      });
+      setTotalOpened(prev => prev + 1);
+      setOnlineUsers(prev => Math.max(200, prev + Math.floor(Math.random() * 10) - 4));
+    }, 3000);
+
+    setLiveDrops([generateDrop(), generateDrop(), generateDrop(), generateDrop(), generateDrop()]);
+
+    return () => clearInterval(interval);
+  }, []);
 
   const cases = [
     {
@@ -126,6 +182,84 @@ const Index = () => {
                   </div>
                   <h3 className="font-heading text-2xl font-bold">Выгодно</h3>
                   <p className="text-muted-foreground">Лучшие шансы на редкие предметы</p>
+                </div>
+              </Card>
+            </div>
+
+            <div className="grid md:grid-cols-2 gap-8">
+              <Card className="p-6 bg-card/50 backdrop-blur border-primary/30">
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="w-10 h-10 bg-primary/20 rounded-full flex items-center justify-center">
+                    <Icon name="Activity" size={20} className="text-primary" />
+                  </div>
+                  <h3 className="font-heading text-2xl font-bold">Последние открытия</h3>
+                  <div className="ml-auto flex items-center gap-2">
+                    <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                    <span className="text-sm text-muted-foreground">Live</span>
+                  </div>
+                </div>
+                <div className="space-y-3">
+                  {liveDrops.map((drop, index) => (
+                    <div 
+                      key={drop.id}
+                      className="flex items-center gap-4 p-4 bg-muted/30 rounded-lg transition-all animate-slide-up"
+                      style={{ 
+                        animationDelay: `${index * 0.1}s`,
+                        borderLeft: `3px solid ${drop.color}`
+                      }}
+                    >
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className="font-heading font-bold">{drop.username}</span>
+                          <span className="text-xs text-muted-foreground">{drop.timestamp}</span>
+                        </div>
+                        <p className="text-sm">{drop.item}</p>
+                      </div>
+                      <Badge style={{ backgroundColor: drop.color, color: 'white' }}>
+                        {drop.rarity}
+                      </Badge>
+                    </div>
+                  ))}
+                </div>
+              </Card>
+
+              <Card className="p-6 bg-card/50 backdrop-blur border-secondary/30">
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="w-10 h-10 bg-secondary/20 rounded-full flex items-center justify-center">
+                    <Icon name="TrendingUp" size={20} className="text-secondary" />
+                  </div>
+                  <h3 className="font-heading text-2xl font-bold">Статистика</h3>
+                </div>
+                <div className="space-y-6">
+                  <div className="p-6 bg-gradient-to-br from-primary/20 to-transparent rounded-xl border border-primary/30">
+                    <div className="text-center">
+                      <div className="text-4xl font-bold font-heading mb-2 bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+                        {totalOpened.toLocaleString()}
+                      </div>
+                      <div className="text-sm text-muted-foreground">Всего открыто кейсов</div>
+                    </div>
+                  </div>
+                  
+                  <div className="p-6 bg-gradient-to-br from-secondary/20 to-transparent rounded-xl border border-secondary/30">
+                    <div className="text-center">
+                      <div className="flex items-center justify-center gap-2 mb-2">
+                        <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
+                        <div className="text-4xl font-bold font-heading">{onlineUsers}</div>
+                      </div>
+                      <div className="text-sm text-muted-foreground">Игроков онлайн</div>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="p-4 bg-muted/30 rounded-lg text-center">
+                      <div className="text-2xl font-bold mb-1">1,247</div>
+                      <div className="text-xs text-muted-foreground">За сегодня</div>
+                    </div>
+                    <div className="p-4 bg-muted/30 rounded-lg text-center">
+                      <div className="text-2xl font-bold mb-1">8.5%</div>
+                      <div className="text-xs text-muted-foreground">Редких дропов</div>
+                    </div>
+                  </div>
                 </div>
               </Card>
             </div>
