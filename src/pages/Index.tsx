@@ -9,6 +9,7 @@ import CaseOpening from '@/components/CaseOpening';
 const Index = () => {
   const [activeSection, setActiveSection] = useState('home');
   const [openingCase, setOpeningCase] = useState<any>(null);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const cases = [
     {
@@ -404,13 +405,47 @@ const Index = () => {
             </div>
 
             <div className="md:hidden">
-              <Button variant="outline" size="icon">
-                <Icon name="Menu" size={24} />
+              <Button 
+                variant="outline" 
+                size="icon"
+                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              >
+                <Icon name={mobileMenuOpen ? "X" : "Menu"} size={24} />
               </Button>
             </div>
           </div>
         </div>
       </nav>
+
+      {mobileMenuOpen && (
+        <div className="md:hidden fixed inset-0 top-[73px] z-40 bg-background/95 backdrop-blur-lg animate-fade-in">
+          <div className="container mx-auto px-6 py-8 space-y-2">
+            {[
+              { id: 'home', label: 'Главная', icon: 'Home' },
+              { id: 'cases', label: 'Кейсы', icon: 'Package' },
+              { id: 'rules', label: 'Правила', icon: 'Shield' },
+              { id: 'faq', label: 'FAQ', icon: 'HelpCircle' },
+              { id: 'profile', label: 'Профиль', icon: 'User' },
+              { id: 'leaderboard', label: 'Рейтинг', icon: 'Trophy' }
+            ].map((item) => (
+              <Button
+                key={item.id}
+                variant={activeSection === item.id ? 'default' : 'ghost'}
+                onClick={() => {
+                  setActiveSection(item.id);
+                  setMobileMenuOpen(false);
+                }}
+                className={`w-full justify-start text-lg py-6 ${
+                  activeSection === item.id ? 'bg-primary hover:bg-primary/90' : ''
+                }`}
+              >
+                <Icon name={item.icon as any} className="mr-3" size={24} />
+                {item.label}
+              </Button>
+            ))}
+          </div>
+        </div>
+      )}
 
       <main className="container mx-auto px-6 py-12">
         {renderSection()}
