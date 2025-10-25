@@ -40,6 +40,86 @@ const CaseOpening = ({ caseData, onClose }: CaseOpeningProps) => {
   const [wonItem, setWonItem] = useState<WeaponItem | null>(null);
   const [showResult, setShowResult] = useState(false);
   const rouletteRef = useRef<HTMLDivElement>(null);
+  const spinSoundRef = useRef<HTMLAudioElement | null>(null);
+  const winSoundRef = useRef<HTMLAudioElement | null>(null);
+  const tickSoundRef = useRef<HTMLAudioElement | null>(null);
+
+  useEffect(() => {
+    spinSoundRef.current = new Audio();
+    winSoundRef.current = new Audio();
+    tickSoundRef.current = new Audio();
+    
+    return () => {
+      spinSoundRef.current?.pause();
+      winSoundRef.current?.pause();
+      tickSoundRef.current?.pause();
+    };
+  }, []);
+
+  const playSpinSound = () => {
+    if (spinSoundRef.current) {
+      const audioContext = new AudioContext();
+      const oscillator = audioContext.createOscillator();
+      const gainNode = audioContext.createGain();
+      
+      oscillator.connect(gainNode);
+      gainNode.connect(audioContext.destination);
+      
+      oscillator.frequency.setValueAtTime(200, audioContext.currentTime);
+      oscillator.frequency.exponentialRampToValueAtTime(100, audioContext.currentTime + 5);
+      
+      gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
+      gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 5);
+      
+      oscillator.start();
+      oscillator.stop(audioContext.currentTime + 5);
+    }
+  };
+
+  const playWinSound = (rarity: string) => {
+    const audioContext = new AudioContext();
+    const oscillator = audioContext.createOscillator();
+    const gainNode = audioContext.createGain();
+    
+    oscillator.connect(gainNode);
+    gainNode.connect(audioContext.destination);
+    
+    if (rarity === 'Легендарный') {
+      oscillator.frequency.setValueAtTime(523.25, audioContext.currentTime);
+      oscillator.frequency.setValueAtTime(659.25, audioContext.currentTime + 0.1);
+      oscillator.frequency.setValueAtTime(783.99, audioContext.currentTime + 0.2);
+      oscillator.frequency.setValueAtTime(1046.50, audioContext.currentTime + 0.3);
+    } else if (rarity === 'Эпический') {
+      oscillator.frequency.setValueAtTime(440, audioContext.currentTime);
+      oscillator.frequency.setValueAtTime(554.37, audioContext.currentTime + 0.1);
+      oscillator.frequency.setValueAtTime(659.25, audioContext.currentTime + 0.2);
+    } else {
+      oscillator.frequency.setValueAtTime(349.23, audioContext.currentTime);
+      oscillator.frequency.setValueAtTime(440, audioContext.currentTime + 0.1);
+    }
+    
+    gainNode.gain.setValueAtTime(0.2, audioContext.currentTime);
+    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+    
+    oscillator.start();
+    oscillator.stop(audioContext.currentTime + 0.5);
+  };
+
+  const playTickSound = () => {
+    const audioContext = new AudioContext();
+    const oscillator = audioContext.createOscillator();
+    const gainNode = audioContext.createGain();
+    
+    oscillator.connect(gainNode);
+    gainNode.connect(audioContext.destination);
+    
+    oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
+    gainNode.gain.setValueAtTime(0.05, audioContext.currentTime);
+    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.05);
+    
+    oscillator.start();
+    oscillator.stop(audioContext.currentTime + 0.05);
+  };
 
   const generateRouletteItems = () => {
     const items: WeaponItem[] = [];
@@ -56,9 +136,15 @@ const CaseOpening = ({ caseData, onClose }: CaseOpeningProps) => {
     setShowResult(false);
     setWonItem(null);
 
+    playSpinSound();
+
     const winningItem = weapons[Math.floor(Math.random() * weapons.length)];
     const winningIndex = Math.floor(rouletteItems.length * 0.75);
     rouletteItems[winningIndex] = winningItem;
+
+    const tickInterval = setInterval(() => {
+      playTickSound();
+    }, 100);
 
     if (rouletteRef.current) {
       const itemWidth = 200;
@@ -75,9 +161,11 @@ const CaseOpening = ({ caseData, onClose }: CaseOpeningProps) => {
       }, 50);
 
       setTimeout(() => {
+        clearInterval(tickInterval);
         setWonItem(winningItem);
         setShowResult(true);
         setIsSpinning(false);
+        playWinSound(winningItem.rarity);
       }, 5500);
     }
   };
