@@ -4,9 +4,11 @@ import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import Icon from '@/components/ui/icon';
+import CaseOpening from '@/components/CaseOpening';
 
 const Index = () => {
   const [activeSection, setActiveSection] = useState('home');
+  const [openingCase, setOpeningCase] = useState<any>(null);
 
   const cases = [
     {
@@ -157,7 +159,10 @@ const Index = () => {
                     <h3 className="font-heading text-2xl font-bold">{caseItem.name}</h3>
                     <div className="flex items-center justify-between">
                       <span className="text-3xl font-bold text-primary">{caseItem.price}</span>
-                      <Button className="bg-primary hover:bg-primary/90 pulse-glow">
+                      <Button 
+                        className="bg-primary hover:bg-primary/90 pulse-glow"
+                        onClick={() => setOpeningCase(caseItem)}
+                      >
                         <Icon name="Unlock" className="mr-2" size={18} />
                         Открыть
                       </Button>
@@ -360,6 +365,14 @@ const Index = () => {
   };
 
   return (
+    <>
+      {openingCase && (
+        <CaseOpening 
+          caseData={openingCase} 
+          onClose={() => setOpeningCase(null)} 
+        />
+      )}
+      
     <div className="min-h-screen bg-background">
       <nav className="sticky top-0 z-50 bg-background/80 backdrop-blur-lg border-b border-border">
         <div className="container mx-auto px-6 py-4">
@@ -429,6 +442,7 @@ const Index = () => {
         </div>
       </footer>
     </div>
+    </>
   );
 };
 
